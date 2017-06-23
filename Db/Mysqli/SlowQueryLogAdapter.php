@@ -23,8 +23,6 @@ class SlowQueryLogAdapter extends FakeParent
 				return;
 			}
 
-			if ($this->inTransaction())
-
 			$queryInfo = $this->queryLog[$queryId];
 
 			$time = $queryInfo['complete'] - $queryInfo['start'];
