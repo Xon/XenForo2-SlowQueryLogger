@@ -1,0 +1,14 @@
+{
+    "option.sv_slowquery_log_threshold.txt": {
+        "global_cache": false,
+        "version_id": 2000070,
+        "version_string": "2.0.0",
+        "hash": "c50e1adf299ce5baa5382d17abfe443c"
+    },
+    "option_explain.sv_slowquery_log_threshold.txt": {
+        "global_cache": false,
+        "version_id": 2000070,
+        "version_string": "2.0.0",
+        "hash": "1459f93e7dc714ed613ba6bb496b9390"
+    }
+}

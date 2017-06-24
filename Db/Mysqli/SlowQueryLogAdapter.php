@@ -8,9 +8,18 @@ use XF\Db\Exception;
 
 class SlowQueryLogAdapter extends FakeParent
 {
+	protected static $logging = false;
+
 	public function logQueryCompletion($queryId = null)
 	{
 		parent::logQueryCompletion($queryId);
+
+		if (self::$logging)
+		{
+			return;
+		}
+
+		self::$logging = true;
 
 		try
 		{
@@ -34,5 +43,7 @@ class SlowQueryLogAdapter extends FakeParent
 		} catch (Exception $ignored)
 		{
 		}
+
+		self::$logging = false;
 	}
 }
