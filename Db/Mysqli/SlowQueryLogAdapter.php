@@ -40,10 +40,13 @@ class SlowQueryLogAdapter extends FakeParent
 			{
 				\XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)), false);
 			}
-		} catch (Exception $ignored)
+		} 
+		catch (Exception $ignored)
 		{
 		}
-
-		self::$logging = false;
+		finally
+		{
+			self::$logging = false;
+		}
 	}
 }
