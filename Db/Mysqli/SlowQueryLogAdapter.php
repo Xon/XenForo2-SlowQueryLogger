@@ -8,9 +8,18 @@ use XF\Db\Exception;
 
 class SlowQueryLogAdapter extends FakeParent
 {
+	protected static $logging = false;
+
 	public function logQueryCompletion($queryId = null)
 	{
 		parent::logQueryCompletion($queryId);
+
+		if (self::$logging)
+		{
+			return;
+		}
+
+		self::$logging = true;
 
 		try
 		{
@@ -29,10 +38,12 @@ class SlowQueryLogAdapter extends FakeParent
 
 			if (Listener::$queryLimit && ($time) > Listener::$queryLimit * 1000)
 			{
-				\XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)));
+				\XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)), false);
 			}
 		} catch (Exception $ignored)
 		{
 		}
+
+		self::$logging = false;
 	}
 }
