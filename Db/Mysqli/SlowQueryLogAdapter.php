@@ -38,7 +38,7 @@ class SlowQueryLogAdapter extends FakeParent
 
 			if (Listener::$queryLimit && ($time) > Listener::$queryLimit * 1000)
 			{
-				\XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)));
+				\XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)), false);
 			}
 		} catch (Exception $ignored)
 		{
