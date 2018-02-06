@@ -1,14 +1,26 @@
 {
-    "option.sv_slowquery_log_threshold.txt": {
+    "option.sv_slowquery_threshold.txt": {
         "global_cache": false,
-        "version_id": 2000070,
+        "version_id": 2000071,
         "version_string": "2.0.0",
         "hash": "c50e1adf299ce5baa5382d17abfe443c"
     },
-    "option_explain.sv_slowquery_log_threshold.txt": {
+    "option.sv_slowtransaction_threshold.txt": {
         "global_cache": false,
-        "version_id": 2000070,
+        "version_id": 2000071,
         "version_string": "2.0.0",
-        "hash": "1459f93e7dc714ed613ba6bb496b9390"
+        "hash": "49b00447aa6168fbfff0caeb5b01e9b3"
+    },
+    "option_explain.sv_slowquery_threshold.txt": {
+        "global_cache": false,
+        "version_id": 2000071,
+        "version_string": "2.0.0",
+        "hash": "da7500a78cdb60e89f273a3398b5a895"
+    },
+    "option_explain.sv_slowtransaction_threshold.txt": {
+        "global_cache": false,
+        "version_id": 2000071,
+        "version_string": "2.0.0",
+        "hash": "7c54b65549fca684fefc347fbb07f15b"
     }
 }

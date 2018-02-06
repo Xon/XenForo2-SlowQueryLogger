@@ -1,0 +1,3 @@
+Queries that take longer than this will cause a log to be added to the server error log.<br/>
+<br/>
+<b>WARNING: Setting this too low may cause your site to become inoperable.</b>

@@ -2,27 +2,25 @@
 
 namespace SV\SlowQueryLogger;
 
-use XF\Db\Exception;
-
 class Listener
 {
 	public static $queryLimit = null;
 
 	public static function appSetup(\XF\App $app)
 	{
-		$dbAdapterClass = $app->config('db')['adapterClass'];
-
 		$result = true;
-
-		if (!class_exists('SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent', false))
+        $fakeParent = 'SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent';
+		if (!class_exists($fakeParent, false))
 		{
-			$result = class_alias($dbAdapterClass, 'SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent', false);
+            /** @noinspection PhpUnusedLocalVariableInspection */
+            $dbAdapterClass = $app->config('db')->adapterClass;
+			$result = class_alias($dbAdapterClass, $fakeParent, false);
 		}
 
 		// just in case
 		if ($result)
 		{
-			self::$queryLimit = \XF::options()->sv_slowquery_log_threshold;
+			self::$queryLimit = \XF::options()->sv_slowquery_threshold;
 
 			$app->container()->set('db', function ($c)
 			{
