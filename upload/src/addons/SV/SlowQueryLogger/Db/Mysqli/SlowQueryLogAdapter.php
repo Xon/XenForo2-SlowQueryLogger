@@ -57,6 +57,11 @@ class SlowQueryLogAdapter extends FakeParent
 
 	public function logQueryCompletion($queryId = null)
 	{
+        /*
+        WARNING: this function is called after the query is finished initially executing, but not before all results are fetched.
+        Invoking any XF function which touches XenForo_Application::getDb() will likely destroy any unfetched results!!!!
+        must call injectSlowQueryDbConn/removeSlowQueryDbConn around any database access
+        */
 		parent::logQueryCompletion($queryId);
 
 		if (self::$logging)
