@@ -4,11 +4,56 @@ namespace SV\SlowQueryLogger\Db\Mysqli;
 
 use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent;
 use SV\SlowQueryLogger\Listener;
+use XF\Container;
 use XF\Db\Exception;
 
 class SlowQueryLogAdapter extends FakeParent
 {
 	protected static $logging = false;
+
+    /** @var \XF\Db\AbstractAdapter */
+    static $slowQueryDb = null;
+    /** @var \XF\Db\AbstractAdapter */
+    static $appDb = null;
+
+    public static function injectSlowQueryDbConn()
+    {
+        $app = \XF::app();
+        if (self::$slowQueryDb === null)
+        {
+            $config = $app->config();
+            $dbConfig = $config['db'];
+            $adapterClass = $dbConfig['adapterClass'];
+            unset($dbConfig['adapterClass']);
+
+            /** @var \XF\Db\AbstractAdapter $db */
+            self::$slowQueryDb = new $adapterClass($dbConfig, $config->fullUnicode);
+            // prevent recursive profiling
+            self::$slowQueryDb->logQueries(false, false);
+        }
+        if (self::$appDb !== null)
+        {
+            throw new \LogicException('Nesting calls to injectSlowQueryDbConn is not supported');
+        }
+
+
+        self::$appDb = $app->db();
+        /** @var Container $container */
+        $container = $app->container();
+        $container->set('db', self::$slowQueryDb);
+    }
+
+    public static function removeSlowQueryDbConn()
+    {
+        if (self::$appDb === null)
+        {
+            throw new \LogicException('Must call injectSlowQueryDbConn before removeSlowQueryDbConn');
+        }
+        /** @var Container $container */
+        $container = \XF::app()->container();
+        $container->set('db', self::$appDb);
+        self::$appDb = null;
+    }
 
 	public function logQueryCompletion($queryId = null)
 	{
@@ -38,9 +83,17 @@ class SlowQueryLogAdapter extends FakeParent
 
 			if (Listener::$queryLimit && ($time) > Listener::$queryLimit * 1000)
 			{
-				\XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)), false);
+                self::injectSlowQueryDbConn();
+                try
+                {
+				    \XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)), false);
+                }
+                finally
+                {
+                    self::removeSlowQueryDbConn();
+                }
 			}
-		} 
+		}
 		catch (Exception $ignored)
 		{
 		}
