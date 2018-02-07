@@ -21,8 +21,6 @@ class Listener
         // just in case
         if ($result)
         {
-            self::$queryLimit = \XF::options()->sv_slowquery_threshold;
-
             $app->container()->set(
                 'db', function ($c) {
                 $config = $c['config'];
