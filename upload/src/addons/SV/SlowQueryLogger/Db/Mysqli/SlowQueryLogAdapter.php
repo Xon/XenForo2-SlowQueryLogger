@@ -177,7 +177,7 @@ class SlowQueryLogAdapter extends FakeParent
 
         $oldLogSimpleOnly = $this->logSimpleOnly;
         $oldLogQueries = $this->logQueries;
-        $this->logSimpleOnly = $oldLogQueries && $oldLogSimpleOnly;
+        $this->logSimpleOnly = !$oldLogQueries || $oldLogSimpleOnly;
         $this->logQueries = true;
         try
         {
@@ -220,15 +220,28 @@ class SlowQueryLogAdapter extends FakeParent
         Invoking any XF function which touches XenForo_Application::getDb() will likely destroy any unfetched results!!!!
         must call injectSlowQueryDbConn/removeSlowQueryDbConn around any database access
         */
-        parent::logQueryCompletion($queryId);
-        $queryEndTime = microtime(true);
+        if (!$this->reportSlowQueries)
+        {
+            parent::logQueryCompletion($queryId);
+
+            return;
+        }
 
         $oldLogSimpleOnly = $this->logSimpleOnly;
         $oldLogQueries = $this->logQueries;
-        $this->logSimpleOnly = $oldLogQueries && $oldLogSimpleOnly;
+        $this->logSimpleOnly = !$oldLogQueries || $oldLogSimpleOnly;
         $this->logQueries = true;
         try
         {
+            parent::logQueryCompletion($queryId);
+            $queryEndTime = microtime(true);
+
+            if ($this->queryCount >= 150 && $oldLogSimpleOnly === null)
+            {
+                // we haven't specified that we want full details, so switch to reduce memory usage
+                $oldLogSimpleOnly = true;
+            }
+
             if (!$queryId)
             {
                 $queryId = $this->queryCount;
