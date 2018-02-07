@@ -9,7 +9,7 @@ use XF\Db\Exception;
 
 class SlowQueryLogAdapter extends FakeParent
 {
-	protected static $logging = false;
+    protected static $logging = false;
 
     /** @var \XF\Db\AbstractAdapter */
     static $slowQueryDb = null;
@@ -55,56 +55,60 @@ class SlowQueryLogAdapter extends FakeParent
         self::$appDb = null;
     }
 
-	public function logQueryCompletion($queryId = null)
-	{
+//    public function logQueryExecution($query, array $params = [])
+//    {
+//    }
+
+    public function logQueryCompletion($queryId = null)
+    {
         /*
         WARNING: this function is called after the query is finished initially executing, but not before all results are fetched.
         Invoking any XF function which touches XenForo_Application::getDb() will likely destroy any unfetched results!!!!
         must call injectSlowQueryDbConn/removeSlowQueryDbConn around any database access
         */
-		parent::logQueryCompletion($queryId);
+        parent::logQueryCompletion($queryId);
 
-		if (self::$logging)
-		{
-			return;
-		}
+        if (self::$logging)
+        {
+            return;
+        }
 
-		self::$logging = true;
+        self::$logging = true;
 
-		try
-		{
-			if (!$queryId)
-			{
-				$queryId = $this->queryCount;
-			}
-			if (!isset($this->queryLog[$queryId]))
-			{
-				return;
-			}
+        try
+        {
+            if (!$queryId)
+            {
+                $queryId = $this->queryCount;
+            }
+            if (!isset($this->queryLog[$queryId]))
+            {
+                return;
+            }
 
-			$queryInfo = $this->queryLog[$queryId];
+            $queryInfo = $this->queryLog[$queryId];
 
-			$time = $queryInfo['complete'] - $queryInfo['start'];
+            $time = $queryInfo['complete'] - $queryInfo['start'];
 
-			if (Listener::$queryLimit && ($time) > Listener::$queryLimit * 1000)
-			{
+            if (Listener::$queryLimit && ($time) > Listener::$queryLimit * 1000)
+            {
                 self::injectSlowQueryDbConn();
                 try
                 {
-				    \XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)), false);
+                    \XF::logException(new \Exception("Slow query: " . sprintf('%.10f seconds', $time / 1000)), false);
                 }
                 finally
                 {
                     self::removeSlowQueryDbConn();
                 }
-			}
-		}
-		catch (Exception $ignored)
-		{
-		}
-		finally
-		{
-			self::$logging = false;
-		}
-	}
+            }
+        }
+        catch (Exception $ignored)
+        {
+        }
+        finally
+        {
+            self::$logging = false;
+        }
+    }
 }
