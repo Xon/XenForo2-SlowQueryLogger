@@ -174,7 +174,10 @@ class SlowQueryLogAdapter extends FakeParent
         }
         */
 
-        $old = $this->logQueries;
+
+        $oldLogSimpleOnly = $this->logSimpleOnly;
+        $oldLogQueries = $this->logQueries;
+        $this->logSimpleOnly = $oldLogQueries && $oldLogSimpleOnly;
         $this->logQueries = true;
         try
         {
@@ -182,7 +185,8 @@ class SlowQueryLogAdapter extends FakeParent
         }
         finally
         {
-            $this->logQueries = $old;
+            $this->logQueries = $oldLogQueries;
+            $this->logSimpleOnly = $oldLogSimpleOnly;
             if ($captureQueryId)
             {
                 $this->transactionEndQueryId = $queryId;
@@ -199,7 +203,7 @@ class SlowQueryLogAdapter extends FakeParent
         {
             $request = \XF::app()->request();
 
-            $requestPaths = [
+            $requestData = [
                 'url' => $request->getRequestUri(),
                 'referrer' => $request->getReferrer(),
                 '_GET' => $_GET,
@@ -219,7 +223,9 @@ class SlowQueryLogAdapter extends FakeParent
         parent::logQueryCompletion($queryId);
         $queryEndTime = microtime(true);
 
-        $old = $this->logQueries;
+        $oldLogSimpleOnly = $this->logSimpleOnly;
+        $oldLogQueries = $this->logQueries;
+        $this->logSimpleOnly = $oldLogQueries && $oldLogSimpleOnly;
         $this->logQueries = true;
         try
         {
@@ -252,7 +258,8 @@ class SlowQueryLogAdapter extends FakeParent
         }
         finally
         {
-            $this->logQueries = $old;
+            $this->logQueries = $oldLogQueries;
+            $this->logSimpleOnly = $oldLogSimpleOnly;
         }
 
         $queryEndTime = $queryEndTime - $this->startTransactionTime;
