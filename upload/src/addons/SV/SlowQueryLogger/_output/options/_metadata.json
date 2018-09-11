@@ -1,8 +1,0 @@
-{
-    "sv_slowquery_threshold.json": {
-        "hash": "96d0767096f9f96259da42e7e780bc06"
-    },
-    "sv_slowtransaction_threshold.json": {
-        "hash": "7dc40b62b0c8d8e1c4089e90e8e037a2"
-    }
-}
