@@ -2,15 +2,16 @@
     "legacy_addon_id": "SV_SlowQueryLogger",
     "title": "Slow Query Logger",
     "description": "Logs slow queries to the server error log.",
-    "version_id": 2000071,
-    "version_string": "2.0.0",
+    "version_id": 2000100,
+    "version_string": "2.0.1",
     "dev" : "Xon",
     "dev_url": "https://atelieraphelion.com/",
     "faq_url": "",
     "support_url": "https://xenforo.com/community/resources/slow-query-logger.6139/",
     "extra_urls": [],
     "require" : {
+        "XF": [2010070, "XenForo 2.1.0+"],
         "php": ["5.6.0", "PHP 5.6.0+"]
     },
-    "icon": ""
+    "icon": "fa-forward"
 }
