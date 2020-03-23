@@ -3,30 +3,41 @@
 namespace SV\SlowQueryLogger\Db\Mysqli;
 
 use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent;
-use SV\SlowQueryLogger\Listener;
 use XF\Container;
+use XF\Db\AbstractAdapter;
 use XF\Db\Exception;
 
+/**
+ * Class SlowQueryLogAdapter
+ *
+ * @package SV\SlowQueryLogger\Db\Mysqli
+ */
 class SlowQueryLogAdapter extends FakeParent
 {
     /** @var float */
-    protected $slowQuery             = 1.5;
-    /** @var float  */
-    protected $slowTransaction       = 1;
+    protected $slowQuery = 1.5;
+    /** @var float */
+    protected $slowTransaction = 1;
     /** @var bool */
-    protected $reportSlowQueries     = true;
+    protected $reportSlowQueries = true;
     /** @var int|null */
-    protected $startTransactionTime  = null;
+    protected $startTransactionTime = null;
     /** @var int|null */
     protected $transactionEndQueryId = null;
     /** @var int */
-    protected $startedTransaction    = 0;
+    protected $startedTransaction = 0;
 
-    /** @var \XF\Db\AbstractAdapter */
+    /** @var AbstractAdapter */
     static $slowQueryDb = null;
-    /** @var \XF\Db\AbstractAdapter */
+    /** @var AbstractAdapter */
     static $appDb = null;
 
+    /**
+     * SlowQueryLogAdapter constructor.
+     *
+     * @param array $config
+     * @param bool  $fullUnicode
+     */
     public function __construct(array $config, $fullUnicode = false)
     {
         parent::__construct($config, $fullUnicode);
@@ -45,7 +56,7 @@ class SlowQueryLogAdapter extends FakeParent
             $adapterClass = $dbConfig['adapterClass'];
             unset($dbConfig['adapterClass']);
 
-            /** @var \XF\Db\AbstractAdapter $db */
+            /** @var AbstractAdapter $db */
             self::$slowQueryDb = new $adapterClass($dbConfig, $config['fullUnicode']);
             // prevent recursive profiling
             self::$slowQueryDb->logQueries(false, false);
@@ -74,9 +85,9 @@ class SlowQueryLogAdapter extends FakeParent
         self::$appDb = null;
     }
 
-    /** @var bool  */
+    /** @var bool */
     protected $isTransactionStartStatement = false;
-    /** @var bool  */
+    /** @var bool */
     protected $isTransactionFinishStatement = false;
 
     public function beginTransaction()
@@ -141,6 +152,11 @@ class SlowQueryLogAdapter extends FakeParent
         return false;
     }
 
+    /**
+     * @param string $query
+     * @param array  $params
+     * @return int
+     */
     public function logQueryExecution($query, array $params = [])
     {
         if (!$this->reportSlowQueries)
@@ -196,6 +212,9 @@ class SlowQueryLogAdapter extends FakeParent
         return $queryId;
     }
 
+    /**
+     * @return array|null
+     */
     protected function getRequestDataForExceptionLog()
     {
         static $requestData = null;
@@ -204,20 +223,24 @@ class SlowQueryLogAdapter extends FakeParent
             $request = \XF::app()->request();
 
             $requestData = [
-                'url' => $request->getRequestUri(),
+                'url'      => $request->getRequestUri(),
                 'referrer' => $request->getReferrer(),
-                '_GET' => $_GET,
-                '_POST' => $request->filterForLog($_POST)
+                '_GET'     => $_GET,
+                '_POST'    => $request->filterForLog($_POST)
             ];
         }
+
         return $requestData;
     }
 
+    /**
+     * @param int|null $queryId
+     */
     public function logQueryCompletion($queryId = null)
     {
         /*
         WARNING: this function is called after the query is finished initially executing, but not before all results are fetched.
-        Invoking any XF function which touches XenForo_Application::getDb() will likely destroy any unfetched results!!!!
+        Invoking any XF function which touches \XF::db() will likely destroy any unfetched results!!!!
         must call injectSlowQueryDbConn/removeSlowQueryDbConn around any database access
         */
         if (!$this->reportSlowQueries)

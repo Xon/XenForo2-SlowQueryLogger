@@ -2,10 +2,16 @@
 
 namespace SV\SlowQueryLogger;
 
+/**
+ * Class Listener
+ *
+ * @package SV\SlowQueryLogger
+ */
 class Listener
 {
-    public static $queryLimit = null;
-
+    /**
+     * @param \XF\App $app
+     */
     public static function appSetup(\XF\App $app)
     {
         $result = true;
@@ -13,7 +19,6 @@ class Listener
         if (!class_exists($fakeParent, false))
         {
             $config = $app->config('db');
-            /** @noinspection PhpUnusedLocalVariableInspection */
             $dbAdapterClass = $config['adapterClass'];
             $result = class_alias($dbAdapterClass, $fakeParent, false);
         }
@@ -21,8 +26,7 @@ class Listener
         // just in case
         if ($result)
         {
-            $app->container()->set(
-                'db', function ($c) {
+            $app->container()->set('db', function ($c) {
                 $config = $c['config'];
 
                 $dbConfig = $config['db'];
@@ -37,8 +41,7 @@ class Listener
                 }
 
                 return $db;
-            }
-            );
+            });
         }
         else
         {
