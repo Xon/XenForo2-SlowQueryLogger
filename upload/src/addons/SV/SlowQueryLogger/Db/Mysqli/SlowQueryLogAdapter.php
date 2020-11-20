@@ -156,6 +156,7 @@ class SlowQueryLogAdapter extends FakeParent
      * @param string $query
      * @param array  $params
      * @return int
+     * @noinspection PhpMissingParamTypeInspection
      */
     public function logQueryExecution($query, array $params = [])
     {

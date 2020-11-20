@@ -33,7 +33,6 @@ class Listener
                 $adapterClass = 'SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter';
                 unset($dbConfig['adapterClass']);
 
-                /** @var \XF\Db\AbstractAdapter $db */
                 $db = new $adapterClass($dbConfig, $config['fullUnicode']);
                 if (\XF::$debugMode)
                 {
