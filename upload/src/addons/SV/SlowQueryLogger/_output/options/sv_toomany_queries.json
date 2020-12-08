@@ -5,7 +5,7 @@
     "sub_options": [],
     "validation_class": "",
     "validation_method": "",
-    "default_value": "30",
+    "default_value": "0",
     "relations": {
         "performance": 8430,
         "svSlowQueries": 8430
