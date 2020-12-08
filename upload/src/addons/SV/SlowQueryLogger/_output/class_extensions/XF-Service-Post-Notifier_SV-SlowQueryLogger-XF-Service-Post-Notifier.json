@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Service\\Post\\Notifier",
+    "to_class": "SV\\SlowQueryLogger\\XF\\Service\\Post\\Notifier",
+    "execute_order": 214748300,
+    "active": true
+}

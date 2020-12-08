@@ -1,0 +1,1 @@
+Skip alerting when checking for too many queries

@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Entity\\UserAlert",
+    "to_class": "SV\\SlowQueryLogger\\XF\\Entity\\UserAlert",
+    "execute_order": 214748300,
+    "active": true
+}

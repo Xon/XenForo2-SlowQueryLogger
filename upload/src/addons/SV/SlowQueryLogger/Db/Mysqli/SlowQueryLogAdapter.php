@@ -27,7 +27,9 @@ class SlowQueryLogAdapter extends FakeParent
     /** @var int */
     protected $startedTransaction = 0;
     /** @var int  */
-    protected $queryCount = 0;
+    protected $interestingQueryCount = 0;
+    /** @var bool  */
+    protected $countingQueries = false;
     /** @var int  */
     protected $tooManyQueryThreshold = 30;
     /** @var bool */
@@ -85,9 +87,10 @@ class SlowQueryLogAdapter extends FakeParent
         }
         if ($this->tooManyQueryThreshold)
         {
+            $this->countingQueries = true;
             $dbAdapterStartTime = microtime(true);
             register_shutdown_function(function () use ($dbAdapterStartTime) {
-                if ($this->queryCount > $this->tooManyQueryThreshold)
+                if ($this->interestingQueryCount > $this->tooManyQueryThreshold)
                 {
                     $time = microtime(true) - $dbAdapterStartTime;
                     $requestData = $this->getRequestDataForExceptionLog();
@@ -102,6 +105,38 @@ class SlowQueryLogAdapter extends FakeParent
                     }
                 }
             });
+        }
+    }
+
+    public function suppressCountingQueries() : bool
+    {
+        $oldValue = $this->countingQueries;
+        $this->countingQueries = false;
+        return $oldValue;
+    }
+
+    /**
+     * @param bool $oldValue
+     */
+    public function resumeCountingQueries(bool $oldValue)
+    {
+        $this->countingQueries = $oldValue;
+    }
+
+    /**
+     * @param \Closure $wrapper
+     * @return mixed
+     */
+    public function suppressCountingQueriesWrapper(\Closure $wrapper)
+    {
+        $oldValue = $this->suppressCountingQueries();
+        try
+        {
+            return $wrapper();
+        }
+        finally
+        {
+            $this->resumeCountingQueries($oldValue);
         }
     }
 
@@ -217,6 +252,12 @@ class SlowQueryLogAdapter extends FakeParent
      */
     public function logQueryExecution($query, array $params = [])
     {
+        if ($this->countingQueries &&
+            !$this->isTransactionStartStatement &&
+            !$this->isTransactionFinishStatement)
+        {
+            $this->interestingQueryCount++;
+        }
         if (!$this->reportSlowQueries)
         {
             return parent::logQueryExecution($query, $params);

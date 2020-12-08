@@ -1,0 +1,6 @@
+{
+    "from_class": "XFRM\\Service\\ResourceUpdate\\Notify",
+    "to_class": "SV\\SlowQueryLogger\\XFRM\\Service\\ResourceUpdate\\Notify",
+    "execute_order": 214748300,
+    "active": true
+}
