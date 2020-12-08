@@ -42,8 +42,8 @@ class SlowQueryLogAdapter extends FakeParent
     {
         parent::__construct($config, $fullUnicode);
         $options = \XF::options();
-        $this->slowQuery = strval(floatval($options->sv_slowquery_threshold)) + 0;
-        $this->slowTransaction = strval(floatval($options->sv_slowtransaction_threshold)) + 0;
+        $this->slowQuery = (float)strval(floatval($options->sv_slowquery_threshold)) + 0;
+        $this->slowTransaction = (float)strval(floatval($options->sv_slowtransaction_threshold)) + 0;
     }
 
     public static function injectSlowQueryDbConn()
@@ -138,10 +138,7 @@ class SlowQueryLogAdapter extends FakeParent
         $this->startedTransaction += 1;
     }
 
-    /**
-     * @return bool
-     */
-    protected function stopTransactionTracking()
+    protected function stopTransactionTracking(): bool
     {
         $this->startedTransaction -= 1;
         if ($this->startedTransaction === 0)
@@ -157,6 +154,7 @@ class SlowQueryLogAdapter extends FakeParent
      * @param array  $params
      * @return int
      * @noinspection PhpMissingParamTypeInspection
+     * @noinspection PhpMissingReturnTypeInspection
      */
     public function logQueryExecution($query, array $params = [])
     {
@@ -215,6 +213,7 @@ class SlowQueryLogAdapter extends FakeParent
 
     /**
      * @return array|null
+     * @noinspection PhpMissingReturnTypeInspection
      */
     protected function getRequestDataForExceptionLog()
     {
