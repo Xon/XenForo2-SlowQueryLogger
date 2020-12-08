@@ -26,11 +26,34 @@ class SlowQueryLogAdapter extends FakeParent
     protected $transactionEndQueryId = null;
     /** @var int */
     protected $startedTransaction = 0;
+    /** @var int  */
+    protected $queryCount = 0;
+    /** @var int  */
+    protected $tooManyQueryThreshold = 30;
+    /** @var bool */
+    protected $tooManyQueryPublicOnly = true;
 
     /** @var AbstractAdapter */
     static $slowQueryDb = null;
     /** @var AbstractAdapter */
     static $appDb = null;
+
+
+    /**
+     * @param string      $name
+     * @param mixed|null  $defaultValue
+     * @return mixed|null
+     */
+    protected function getXfOption(string $name, $defaultValue = null)
+    {
+        $options = \XF::options();
+        if ($options->offsetExists($name))
+        {
+            return $options->offsetGet($name);
+        }
+
+        return $defaultValue;
+    }
 
     /**
      * SlowQueryLogAdapter constructor.
@@ -41,9 +64,45 @@ class SlowQueryLogAdapter extends FakeParent
     public function __construct(array $config, $fullUnicode = false)
     {
         parent::__construct($config, $fullUnicode);
-        $options = \XF::options();
-        $this->slowQuery = (float)strval(floatval($options->sv_slowquery_threshold)) + 0;
-        $this->slowTransaction = (float)strval(floatval($options->sv_slowtransaction_threshold)) + 0;
+        $this->slowQuery = (float)strval(floatval($this->getXfOption('sv_slowquery_threshold', $this->slowQuery))) + 0;
+        $this->slowTransaction = (float)strval(floatval($this->getXfOption('sv_slowtransaction_threshold', $this->slowTransaction))) + 0;
+        $this->tooManyQueryThreshold = (int)$this->getXfOption('sv_toomany_queries', 30);
+        if ($this->tooManyQueryThreshold < 0)
+        {
+            $this->tooManyQueryThreshold = 0;
+        }
+        if ((bool)$this->getXfOption('sv_toomany_queries_public_only', $this->tooManyQueryPublicOnly))
+        {
+            if (!(\XF::app() instanceof \XF\Pub\App))
+            {
+                $this->tooManyQueryThreshold = 0;
+            }
+            else if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/job.php')
+            {
+                // skip job.php since it will very likely cause many queries
+                $this->tooManyQueryThreshold = 0;
+            }
+        }
+        if ($this->tooManyQueryThreshold)
+        {
+            $dbAdapterStartTime = microtime(true);
+            register_shutdown_function(function () use ($dbAdapterStartTime) {
+                if ($this->queryCount > $this->tooManyQueryThreshold)
+                {
+                    $time = microtime(true) - $dbAdapterStartTime;
+                    $requestData = $this->getRequestDataForExceptionLog();
+                    self::injectSlowQueryDbConn();
+                    try
+                    {
+                        \XF::logException(new \Exception('Too many queries query: ' . $this->queryCount . ' in ' . round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
+                    }
+                    finally
+                    {
+                        self::removeSlowQueryDbConn();
+                    }
+                }
+            });
+        }
     }
 
     public static function injectSlowQueryDbConn()

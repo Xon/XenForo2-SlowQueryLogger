@@ -1,0 +1,3 @@
+Helps find N+1 query behaviour<br/>
+If this or more many queries, then log to the error log at the end of the request that this many queries are detected <br/>
+0 to disable

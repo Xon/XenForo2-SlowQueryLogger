@@ -8,6 +8,6 @@
     "default_value": "1.5",
     "relations": {
         "performance": 8420,
-        "svSlowQueries": 8410
+        "svSlowQueries": 8420
     }
 }
