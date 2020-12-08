@@ -13,6 +13,11 @@ namespace SV\SlowQueryLogger\XF\Entity
 	class XFCP_UserAlert extends \XF\Entity\UserAlert {}
 }
 
+namespace SV\SlowQueryLogger\XF\Job
+{
+	class XFCP_Manager extends \XF\Job\Manager {}
+}
+
 namespace SV\SlowQueryLogger\XF\Service\Post
 {
 	class XFCP_Notifier extends \XF\Service\Post\Notifier {}

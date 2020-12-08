@@ -1,0 +1,6 @@
+{
+    "from_class": "XF\\Job\\Manager",
+    "to_class": "SV\\SlowQueryLogger\\XF\\Job\\Manager",
+    "execute_order": 214748300,
+    "active": true
+}
