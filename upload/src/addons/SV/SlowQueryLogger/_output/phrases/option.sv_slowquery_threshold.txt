@@ -1,1 +1,1 @@
-Slow query threshold (seconds)
+Slow query threshold

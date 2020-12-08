@@ -1,12 +1,13 @@
 {
-    "edit_format": "textbox",
-    "edit_format_params": "",
+    "edit_format": "spinbox",
+    "edit_format_params": "min=0\nstep=any\ndata-step=0.5\nunits={{ phrase('units_seconds') }}",
     "data_type": "unsigned_numeric",
     "sub_options": [],
     "validation_class": "",
     "validation_method": "",
     "default_value": "1",
     "relations": {
-        "performance": 8410
+        "performance": 8410,
+        "svSlowQueries": 8410
     }
 }

@@ -1,1 +1,1 @@
-Slow transaction threshold (seconds)
+Slow transaction threshold
