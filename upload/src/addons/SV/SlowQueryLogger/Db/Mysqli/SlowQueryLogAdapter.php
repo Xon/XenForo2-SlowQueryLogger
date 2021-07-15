@@ -232,7 +232,6 @@ class SlowQueryLogAdapter extends FakeParent
      * @param string $query
      * @param array  $params
      * @return int
-     * @noinspection PhpMissingParamTypeInspection
      * @noinspection PhpMissingReturnTypeInspection
      */
     public function logQueryExecution($query, array $params = [])
@@ -298,7 +297,6 @@ class SlowQueryLogAdapter extends FakeParent
 
     /**
      * @return array|null
-     * @noinspection PhpMissingReturnTypeInspection
      */
     protected function getRequestDataForExceptionLog()
     {

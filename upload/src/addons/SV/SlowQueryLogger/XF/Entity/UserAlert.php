@@ -2,8 +2,6 @@
 
 namespace SV\SlowQueryLogger\XF\Entity;
 
-use XF\Mvc\Entity\Entity;
-
 /**
  * Extends \XF\Entity\UserAlert
  */

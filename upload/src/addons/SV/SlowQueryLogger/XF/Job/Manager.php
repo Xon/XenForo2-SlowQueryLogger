@@ -15,7 +15,6 @@ class Manager extends XFCP_Manager
      * @return \XF\Job\JobResult
      * @throws \Exception
      * @noinspection PhpMissingReturnTypeInspection
-     * @noinspection PhpMissingParamTypeInspection
      */
     protected function runJobInternal(array $job, $maxRunTime)
     {
