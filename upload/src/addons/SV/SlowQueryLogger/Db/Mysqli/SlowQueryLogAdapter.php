@@ -40,23 +40,6 @@ class SlowQueryLogAdapter extends FakeParent
     /** @var AbstractAdapter */
     static $appDb = null;
 
-
-    /**
-     * @param string      $name
-     * @param mixed|null  $defaultValue
-     * @return mixed|null
-     */
-    protected function getXfOption(string $name, $defaultValue = null)
-    {
-        $options = \XF::options();
-        if ($options->offsetExists($name))
-        {
-            return $options->offsetGet($name);
-        }
-
-        return $defaultValue;
-    }
-
     /**
      * SlowQueryLogAdapter constructor.
      *
@@ -66,14 +49,16 @@ class SlowQueryLogAdapter extends FakeParent
     public function __construct(array $config, $fullUnicode = false)
     {
         parent::__construct($config, $fullUnicode);
-        $this->slowQuery = (float)strval(floatval($this->getXfOption('sv_slowquery_threshold', $this->slowQuery))) + 0;
-        $this->slowTransaction = (float)strval(floatval($this->getXfOption('sv_slowtransaction_threshold', $this->slowTransaction))) + 0;
-        $this->tooManyQueryThreshold = (int)$this->getXfOption('sv_toomany_queries', 30);
+        $options = \XF::options();
+
+        $this->slowQuery = (float)($options->sv_slowquery_threshold ?? $this->slowQuery);
+        $this->slowTransaction = (float)($options->sv_slowtransaction_threshold ?? $this->slowTransaction);
+        $this->tooManyQueryThreshold = (int)($options->sv_toomany_queries ?? 30);
         if ($this->tooManyQueryThreshold < 0)
         {
             $this->tooManyQueryThreshold = 0;
         }
-        if ((bool)$this->getXfOption('sv_toomany_queries_public_only', $this->tooManyQueryPublicOnly))
+        if ($options->sv_toomany_queries_public_only ?? $this->tooManyQueryPublicOnly)
         {
             if (!(\XF::app() instanceof \XF\Pub\App))
             {
@@ -369,12 +354,12 @@ class SlowQueryLogAdapter extends FakeParent
             {
                 $queryId = $this->queryCount;
             }
-            if (!isset($this->queryLog[$queryId]))
+
+            $queryInfo = $this->queryLog[$queryId] ?? null;
+            if ($queryInfo === null)
             {
                 return;
             }
-
-            $queryInfo = $this->queryLog[$queryId];
 
             $time = $queryInfo['complete'] - $queryInfo['start'];
 
