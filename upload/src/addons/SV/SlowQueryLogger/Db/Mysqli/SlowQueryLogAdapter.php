@@ -82,7 +82,7 @@ class SlowQueryLogAdapter extends FakeParent
                     self::injectSlowQueryDbConn();
                     try
                     {
-                        \XF::logException(new \Exception('Too many queries query: ' . $this->queryCount . ' in ' . round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
+                        \XF::logException(new \Exception('Too many queries query: ' . $this->queryCount . ' in ' . \round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
                     }
                     finally
                     {
@@ -369,7 +369,7 @@ class SlowQueryLogAdapter extends FakeParent
                 self::injectSlowQueryDbConn();
                 try
                 {
-                    \XF::logException(new \Exception('Slow query: ' . round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
+                    \XF::logException(new \Exception('Slow query: ' . \round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
                 }
                 finally
                 {
@@ -392,7 +392,7 @@ class SlowQueryLogAdapter extends FakeParent
             self::injectSlowQueryDbConn();
             try
             {
-                \XF::logException(new Exception('Slow transaction detected: ' . round($queryEndTime, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
+                \XF::logException(new Exception('Slow transaction detected: ' . \round($queryEndTime, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
             }
             finally
             {

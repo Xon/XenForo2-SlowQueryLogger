@@ -16,11 +16,11 @@ class Listener
     {
         $result = true;
         $fakeParent = 'SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent';
-        if (!class_exists($fakeParent, false))
+        if (!\class_exists($fakeParent, false))
         {
             $config = $app->config('db');
             $dbAdapterClass = $config['adapterClass'];
-            $result = class_alias($dbAdapterClass, $fakeParent, false);
+            $result = \class_alias($dbAdapterClass, $fakeParent, false);
         }
 
         // just in case
