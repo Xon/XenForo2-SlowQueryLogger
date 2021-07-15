@@ -16,7 +16,7 @@ class Notifier extends XFCP_Notifier
      */
     public function notifyAndEnqueue($timeLimit = null)
     {
-        if (!empty(\XF::options()->sv_toomany_queries_skip_alerts))
+        if (\XF::options()->sv_toomany_queries_skip_alerts ?? false)
         {
             $db = \XF::db();
             if ($db instanceof \SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter)

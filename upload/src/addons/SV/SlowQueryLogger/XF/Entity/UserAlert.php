@@ -12,7 +12,7 @@ class UserAlert extends XFCP_UserAlert
     protected function _preSave()
     {
         parent::_preSave();
-        if (!empty(\XF::options()->sv_toomany_queries_skip_alerts))
+        if (\XF::options()->sv_toomany_queries_skip_alerts ?? false)
         {
             $db = \XF::db();
             if ($db instanceof \SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter)
@@ -29,7 +29,7 @@ class UserAlert extends XFCP_UserAlert
     {
         parent::_saveCleanUp($newDbValues);
 
-        if ($this->svSuppressCountingQueries && !empty(\XF::options()->sv_toomany_queries_skip_alerts))
+        if ($this->svSuppressCountingQueries && (\XF::options()->sv_toomany_queries_skip_alerts ?? false))
         {
             $db = \XF::db();
             if ($db instanceof \SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter)
