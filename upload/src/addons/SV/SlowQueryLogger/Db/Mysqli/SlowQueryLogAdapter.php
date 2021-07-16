@@ -342,10 +342,14 @@ class SlowQueryLogAdapter extends FakeParent
             parent::logQueryCompletion($queryId);
             $queryEndTime = \microtime(true);
 
-            if ($this->queryCount >= 150 && $oldLogSimpleOnly === null)
+            if ($this->queryCount >= 150 && !$oldLogSimpleOnly)
             {
                 // we haven't specified that we want full details, so switch to reduce memory usage
                 $oldLogSimpleOnly = true;
+                foreach($this->queryLog as &$query)
+                {
+                    $query['trace'] = null;
+                }
             }
 
             if (!$queryId)
