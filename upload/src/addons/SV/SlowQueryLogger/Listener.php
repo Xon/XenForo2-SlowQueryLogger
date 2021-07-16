@@ -26,7 +26,7 @@ class Listener
         // just in case
         if ($result)
         {
-            $app->container()->set('db', function ($c) {
+            $app->container()->set('db', function ($c) use ($app) {
                 $config = $c['config'];
 
                 $dbConfig = $config['db'];
@@ -36,7 +36,7 @@ class Listener
                 $db = new $adapterClass($dbConfig, $config['fullUnicode']);
                 if (\XF::$debugMode)
                 {
-                    $db->logQueries(true);
+                    $db->logQueries(true, (bool)$app->request()->get('_debug'));
                 }
 
                 return $db;
