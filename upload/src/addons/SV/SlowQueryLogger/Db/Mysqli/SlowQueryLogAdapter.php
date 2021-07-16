@@ -73,11 +73,11 @@ class SlowQueryLogAdapter extends FakeParent
         if ($this->tooManyQueryThreshold)
         {
             $this->countingQueries = true;
-            $dbAdapterStartTime = microtime(true);
-            register_shutdown_function(function () use ($dbAdapterStartTime) {
+            $dbAdapterStartTime = \microtime(true);
+            \register_shutdown_function(function () use ($dbAdapterStartTime) {
                 if ($this->interestingQueryCount > $this->tooManyQueryThreshold)
                 {
-                    $time = microtime(true) - $dbAdapterStartTime;
+                    $time = \microtime(true) - $dbAdapterStartTime;
                     $requestData = $this->getRequestDataForExceptionLog();
                     self::injectSlowQueryDbConn();
                     try
@@ -212,7 +212,7 @@ class SlowQueryLogAdapter extends FakeParent
     {
         if ($this->startedTransaction === 0)
         {
-            $this->startTransactionTime = microtime(true);
+            $this->startTransactionTime = \microtime(true);
         }
         $this->startedTransaction += 1;
     }
@@ -340,7 +340,7 @@ class SlowQueryLogAdapter extends FakeParent
         try
         {
             parent::logQueryCompletion($queryId);
-            $queryEndTime = microtime(true);
+            $queryEndTime = \microtime(true);
 
             if ($this->queryCount >= 150 && $oldLogSimpleOnly === null)
             {
