@@ -36,7 +36,7 @@ class Listener
                 $db = new $adapterClass($dbConfig, $config['fullUnicode']);
                 if (\XF::$debugMode)
                 {
-                    $db->logQueries(true, (bool)$app->request()->get('_debug'));
+                    $db->logQueries(true, !(bool)$app->request()->get('_debug'));
                 }
 
                 return $db;
