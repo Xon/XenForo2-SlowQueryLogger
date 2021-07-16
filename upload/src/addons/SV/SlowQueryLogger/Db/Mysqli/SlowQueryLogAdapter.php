@@ -285,7 +285,7 @@ class SlowQueryLogAdapter extends FakeParent
         finally
         {
             $this->logQueries = $oldLogQueries;
-            $this->logSimpleOnly = $oldLogSimpleOnly;
+            $this->logSimpleOnly = $this->logSimpleOnly && $oldLogSimpleOnly;
             if ($captureQueryId)
             {
                 $this->transactionEndQueryId = $queryId;
@@ -378,7 +378,7 @@ class SlowQueryLogAdapter extends FakeParent
         finally
         {
             $this->logQueries = $oldLogQueries;
-            $this->logSimpleOnly = $oldLogSimpleOnly;
+            $this->logSimpleOnly = $this->logSimpleOnly && $oldLogSimpleOnly;
         }
 
         $queryEndTime = $queryEndTime - $this->startTransactionTime;
