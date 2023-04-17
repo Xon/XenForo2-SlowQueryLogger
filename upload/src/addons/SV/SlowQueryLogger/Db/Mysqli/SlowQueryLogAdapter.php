@@ -6,6 +6,7 @@ use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent;
 use XF\Container;
 use XF\Db\AbstractAdapter;
 use XF\Db\Exception;
+use XF\Db\Mysqli\Adapter as MySqlAdapter;
 use XF\Pub\App;
 use function microtime;
 use function round;
@@ -40,8 +41,6 @@ class SlowQueryLogAdapter extends FakeParent
 
     /** @var AbstractAdapter */
     protected static $slowQueryDb = null;
-    /** @var AbstractAdapter */
-    protected static $appDb = null;
 
     /**
      * SlowQueryLogAdapter constructor.
@@ -52,6 +51,19 @@ class SlowQueryLogAdapter extends FakeParent
     public function __construct(array $config, $fullUnicode = false)
     {
         parent::__construct($config, $fullUnicode);
+
+        self::withOriginalDbAdapter(function() {
+            $this->setupSlowLogger();
+        });
+    }
+
+    /**
+     * Runs in the context of the original database adapter
+     * This ensures database queries do not cause a loop
+     * @return void
+     */
+    protected function setupSlowLogger(): void
+    {
         $options = \XF::options();
 
         $this->slowQuery = (float)($options->sv_slowquery_threshold ?? $this->slowQuery);
@@ -82,15 +94,9 @@ class SlowQueryLogAdapter extends FakeParent
                 {
                     $time = microtime(true) - $dbAdapterStartTime;
                     $requestData = $this->getRequestDataForExceptionLog();
-                    self::injectSlowQueryDbConn();
-                    try
-                    {
+                    self::withOriginalDbAdapter(function() use ($time, $requestData) {
                         \XF::logException(new \Exception('Too many queries query: ' . $this->queryCount . ' in ' . round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
-                    }
-                    finally
-                    {
-                        self::removeSlowQueryDbConn();
-                    }
+                    });
                 }
             });
         }
@@ -125,7 +131,7 @@ class SlowQueryLogAdapter extends FakeParent
         }
     }
 
-    public static function injectSlowQueryDbConn(): void
+    public function withOriginalDbAdapter(\Closure $wrapper)
     {
         $app = \XF::app();
         if (self::$slowQueryDb === null)
@@ -135,32 +141,31 @@ class SlowQueryLogAdapter extends FakeParent
             $adapterClass = $dbConfig['adapterClass'];
             unset($dbConfig['adapterClass']);
 
+            if ($adapterClass === self::class)
+            {
+                $adapterClass = MySqlAdapter::class;
+            }
             /** @var AbstractAdapter $db */
             self::$slowQueryDb = new $adapterClass($dbConfig, $config['fullUnicode']);
             // prevent recursive profiling
             self::$slowQueryDb->logQueries(false, false);
         }
-        if (self::$appDb !== null)
-        {
-            throw new \LogicException('Nesting calls to injectSlowQueryDbConn is not supported');
-        }
 
-        self::$appDb = $app->db();
+        $appDb = $app->container()->getOriginal('db');
         /** @var Container $container */
         $container = $app->container();
         $container->set('db', self::$slowQueryDb);
-    }
 
-    public static function removeSlowQueryDbConn(): void
-    {
-        if (self::$appDb === null)
+        try
         {
-            throw new \LogicException('Must call injectSlowQueryDbConn before removeSlowQueryDbConn');
+            return $wrapper();
         }
-        /** @var Container $container */
-        $container = \XF::app()->container();
-        $container->set('db', self::$appDb);
-        self::$appDb = null;
+        finally
+        {
+            /** @var Container $container */
+            $container = \XF::app()->container();
+            $container->set('db', $appDb);
+        }
     }
 
     /** @var bool */
@@ -365,15 +370,9 @@ class SlowQueryLogAdapter extends FakeParent
             if ($time > $this->slowQuery)
             {
                 $requestData = $this->getRequestDataForExceptionLog();
-                self::injectSlowQueryDbConn();
-                try
-                {
+                self::withOriginalDbAdapter(function() use ($time, $requestData) {
                     \XF::logException(new \Exception('Slow query: ' . round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
-                }
-                finally
-                {
-                    self::removeSlowQueryDbConn();
-                }
+                });
             }
         }
         finally
@@ -388,15 +387,9 @@ class SlowQueryLogAdapter extends FakeParent
         {
             $requestData = $this->getRequestDataForExceptionLog();
             $this->transactionEndQueryId = null;
-            self::injectSlowQueryDbConn();
-            try
-            {
+            self::withOriginalDbAdapter(function() use ($queryEndTime, $requestData) {
                 \XF::logException(new Exception('Slow transaction detected: ' . round($queryEndTime, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
-            }
-            finally
-            {
-                self::removeSlowQueryDbConn();
-            }
+            });
         }
     }
 }
