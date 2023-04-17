@@ -2,25 +2,29 @@
 
 namespace SV\SlowQueryLogger;
 
+use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
+use XF\App;
+use function class_alias;
+use function class_exists;
+
 /**
  * Class Listener
  *
  * @package SV\SlowQueryLogger
  */
-class Listener
+abstract class Listener
 {
-    /**
-     * @param \XF\App $app
-     */
-    public static function appSetup(\XF\App $app)
+    private function __construct() {}
+
+    public static function appSetup(App $app): void
     {
         $result = true;
         $fakeParent = 'SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent';
-        if (!\class_exists($fakeParent, false))
+        if (!class_exists($fakeParent, false))
         {
             $config = $app->config('db');
             $dbAdapterClass = $config['adapterClass'];
-            $result = \class_alias($dbAdapterClass, $fakeParent, false);
+            $result = class_alias($dbAdapterClass, $fakeParent, false);
         }
 
         // just in case
@@ -30,13 +34,14 @@ class Listener
                 $config = $c['config'];
 
                 $dbConfig = $config['db'];
-                $adapterClass = 'SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter';
+                $adapterClass = SlowQueryLogAdapter::class;
                 unset($dbConfig['adapterClass']);
 
                 $db = new $adapterClass($dbConfig, $config['fullUnicode']);
                 if (\XF::$debugMode)
                 {
-                    $db->logQueries(true, !(bool)$app->request()->get('_debug'));
+                    $debugFlag = (bool)$app->request()->get('_debug');
+                    $db->logQueries(true, !$debugFlag);
                 }
 
                 return $db;
@@ -44,7 +49,7 @@ class Listener
         }
         else
         {
-            \XF::logException(new \Exception("Unable to alias existing adapter class for slow query logging!"));
+            \XF::logException(new \Exception('Unable to alias existing adapter class for slow query logging!'));
         }
     }
 }

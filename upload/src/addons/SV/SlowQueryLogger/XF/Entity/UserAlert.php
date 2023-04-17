@@ -2,6 +2,8 @@
 
 namespace SV\SlowQueryLogger\XF\Entity;
 
+use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
+
 /**
  * Extends \XF\Entity\UserAlert
  */
@@ -15,7 +17,7 @@ class UserAlert extends XFCP_UserAlert
         if (\XF::options()->sv_toomany_queries_skip_alerts ?? false)
         {
             $db = \XF::db();
-            if ($db instanceof \SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter)
+            if ($db instanceof SlowQueryLogAdapter)
             {
                 $this->svSuppressCountingQueries = $db->suppressCountingQueries();
             }
@@ -32,7 +34,7 @@ class UserAlert extends XFCP_UserAlert
         if ($this->svSuppressCountingQueries && (\XF::options()->sv_toomany_queries_skip_alerts ?? false))
         {
             $db = \XF::db();
-            if ($db instanceof \SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter)
+            if ($db instanceof SlowQueryLogAdapter)
             {
                 $db->resumeCountingQueries($this->svSuppressCountingQueries);
             }

@@ -2,7 +2,8 @@
 
 namespace SV\SlowQueryLogger\XF\Job;
 
-
+use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
+use XF\Job\JobResult;
 
 /**
  * Extends \XF\Job\Manager
@@ -12,7 +13,7 @@ class Manager extends XFCP_Manager
     /**
      * @param array $job
      * @param int   $maxRunTime
-     * @return \XF\Job\JobResult
+     * @return JobResult
      * @throws \Exception
      * @noinspection PhpMissingReturnTypeInspection
      */
@@ -22,7 +23,7 @@ class Manager extends XFCP_Manager
         if (\XF::options()->tooManyQueryPublicOnly ?? false)
         {
             $db = \XF::db();
-            if ($db instanceof \SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter)
+            if ($db instanceof SlowQueryLogAdapter)
             {
                 return $db->suppressCountingQueriesWrapper(function () use ($job, $maxRunTime) {
                     return parent::runJobInternal($job, $maxRunTime);

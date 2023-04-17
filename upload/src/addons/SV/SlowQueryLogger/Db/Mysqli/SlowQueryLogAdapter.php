@@ -6,6 +6,9 @@ use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent;
 use XF\Container;
 use XF\Db\AbstractAdapter;
 use XF\Db\Exception;
+use XF\Pub\App;
+use function microtime;
+use function round;
 
 /**
  * Class SlowQueryLogAdapter
@@ -36,9 +39,9 @@ class SlowQueryLogAdapter extends FakeParent
     protected $tooManyQueryPublicOnly = true;
 
     /** @var AbstractAdapter */
-    static $slowQueryDb = null;
+    protected static $slowQueryDb = null;
     /** @var AbstractAdapter */
-    static $appDb = null;
+    protected static $appDb = null;
 
     /**
      * SlowQueryLogAdapter constructor.
@@ -60,7 +63,7 @@ class SlowQueryLogAdapter extends FakeParent
         }
         if ($options->sv_toomany_queries_public_only ?? $this->tooManyQueryPublicOnly)
         {
-            if (!(\XF::app() instanceof \XF\Pub\App))
+            if (!(\XF::app() instanceof App))
             {
                 $this->tooManyQueryThreshold = 0;
             }
@@ -73,16 +76,16 @@ class SlowQueryLogAdapter extends FakeParent
         if ($this->tooManyQueryThreshold)
         {
             $this->countingQueries = true;
-            $dbAdapterStartTime = \microtime(true);
-            \register_shutdown_function(function () use ($dbAdapterStartTime) {
+            $dbAdapterStartTime = microtime(true);
+            register_shutdown_function(function () use ($dbAdapterStartTime) {
                 if ($this->interestingQueryCount > $this->tooManyQueryThreshold)
                 {
-                    $time = \microtime(true) - $dbAdapterStartTime;
+                    $time = microtime(true) - $dbAdapterStartTime;
                     $requestData = $this->getRequestDataForExceptionLog();
                     self::injectSlowQueryDbConn();
                     try
                     {
-                        \XF::logException(new \Exception('Too many queries query: ' . $this->queryCount . ' in ' . \round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
+                        \XF::logException(new \Exception('Too many queries query: ' . $this->queryCount . ' in ' . round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
                     }
                     finally
                     {
@@ -100,10 +103,7 @@ class SlowQueryLogAdapter extends FakeParent
         return $oldValue;
     }
 
-    /**
-     * @param bool $oldValue
-     */
-    public function resumeCountingQueries(bool $oldValue)
+    public function resumeCountingQueries(bool $oldValue): void
     {
         $this->countingQueries = $oldValue;
     }
@@ -125,7 +125,7 @@ class SlowQueryLogAdapter extends FakeParent
         }
     }
 
-    public static function injectSlowQueryDbConn()
+    public static function injectSlowQueryDbConn(): void
     {
         $app = \XF::app();
         if (self::$slowQueryDb === null)
@@ -145,14 +145,13 @@ class SlowQueryLogAdapter extends FakeParent
             throw new \LogicException('Nesting calls to injectSlowQueryDbConn is not supported');
         }
 
-
         self::$appDb = $app->db();
         /** @var Container $container */
         $container = $app->container();
         $container->set('db', self::$slowQueryDb);
     }
 
-    public static function removeSlowQueryDbConn()
+    public static function removeSlowQueryDbConn(): void
     {
         if (self::$appDb === null)
         {
@@ -212,7 +211,7 @@ class SlowQueryLogAdapter extends FakeParent
     {
         if ($this->startedTransaction === 0)
         {
-            $this->startTransactionTime = \microtime(true);
+            $this->startTransactionTime = microtime(true);
         }
         $this->startedTransaction += 1;
     }
@@ -278,6 +277,7 @@ class SlowQueryLogAdapter extends FakeParent
         $oldLogQueries = $this->logQueries;
         $this->logSimpleOnly = !$oldLogQueries || $oldLogSimpleOnly;
         $this->logQueries = true;
+        $queryId = null;
         try
         {
             $queryId = parent::logQueryExecution($query, $params);
@@ -286,7 +286,7 @@ class SlowQueryLogAdapter extends FakeParent
         {
             $this->logQueries = $oldLogQueries;
             $this->logSimpleOnly = $this->logSimpleOnly || $oldLogSimpleOnly;
-            if ($captureQueryId)
+            if ($captureQueryId && $queryId !== null)
             {
                 $this->transactionEndQueryId = $queryId;
             }
@@ -295,10 +295,7 @@ class SlowQueryLogAdapter extends FakeParent
         return $queryId;
     }
 
-    /**
-     * @return array|null
-     */
-    protected function getRequestDataForExceptionLog()
+    protected function getRequestDataForExceptionLog(): ?array
     {
         static $requestData = null;
         if ($requestData === null)
@@ -340,7 +337,7 @@ class SlowQueryLogAdapter extends FakeParent
         try
         {
             parent::logQueryCompletion($queryId);
-            $queryEndTime = \microtime(true);
+            $queryEndTime = microtime(true);
 
             if ($this->queryCount >= 150 && !$oldLogSimpleOnly)
             {
@@ -371,7 +368,7 @@ class SlowQueryLogAdapter extends FakeParent
                 self::injectSlowQueryDbConn();
                 try
                 {
-                    \XF::logException(new \Exception('Slow query: ' . \round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
+                    \XF::logException(new \Exception('Slow query: ' . round($time, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
                 }
                 finally
                 {
@@ -394,7 +391,7 @@ class SlowQueryLogAdapter extends FakeParent
             self::injectSlowQueryDbConn();
             try
             {
-                \XF::logException(new Exception('Slow transaction detected: ' . \round($queryEndTime, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
+                \XF::logException(new Exception('Slow transaction detected: ' . round($queryEndTime, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
             }
             finally
             {

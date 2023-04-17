@@ -2,7 +2,7 @@
 
 namespace SV\SlowQueryLogger\XF\Service\Post;
 
-
+use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
 
 /**
  * Extends \XF\Service\Post\Notifier
@@ -19,7 +19,7 @@ class Notifier extends XFCP_Notifier
         if (\XF::options()->sv_toomany_queries_skip_alerts ?? false)
         {
             $db = \XF::db();
-            if ($db instanceof \SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter)
+            if ($db instanceof SlowQueryLogAdapter)
             {
                 return $db->suppressCountingQueriesWrapper(function () use ($timeLimit) {
                     return parent::notifyAndEnqueue($timeLimit);
