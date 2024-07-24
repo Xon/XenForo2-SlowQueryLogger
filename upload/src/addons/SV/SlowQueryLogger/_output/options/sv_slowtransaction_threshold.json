@@ -1,10 +1,11 @@
 {
     "edit_format": "spinbox",
-    "edit_format_params": "min=0\nstep=any\ndata-step=0.5\nunits={{ phrase('units_seconds') }}",
+    "edit_format_params": "min=0\nstep=any\nstepOverride=0.5\nunits={{ phrase('units_seconds') }}",
     "data_type": "unsigned_numeric",
     "sub_options": [],
     "validation_class": "",
     "validation_method": "",
+    "advanced": false,
     "default_value": "1.5",
     "relations": {
         "performance": 8420,
