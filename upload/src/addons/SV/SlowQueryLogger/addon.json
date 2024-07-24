@@ -3,12 +3,15 @@
     "title": "Slow Query Logger",
     "description": "Logs slow queries to the server error log.",
     "version_id": 1682699682,
-    "version_string": "2.2.1",
+    "version_string": "2.3.0",
     "dev": "Xon",
     "dev_url": "https://atelieraphelion.com/",
     "faq_url": "",
     "support_url": "https://xenforo.com/community/resources/slow-query-logger.6139/",
-    "extra_urls": [],
+    "extra_urls": {
+        "License": "https://atelieraphelion.com/products/slow-query-logger.234/copyright",
+        "Add-on site": "https://atelieraphelion.com/products/slow-query-logger.234/"
+    },
     "require": {
         "XF": [
             2020070,
