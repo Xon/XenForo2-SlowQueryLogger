@@ -5,7 +5,7 @@ namespace SV\SlowQueryLogger\XF\Service\Post;
 use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
 
 /**
- * Extends \XF\Service\Post\Notifier
+ * @Extends \XF\Service\Post\Notifier
  */
 class Notifier extends XFCP_Notifier
 {

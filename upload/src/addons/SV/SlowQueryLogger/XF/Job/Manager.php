@@ -6,7 +6,7 @@ use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
 use XF\Job\JobResult;
 
 /**
- * Extends \XF\Job\Manager
+ * @Extends \XF\Job\Manager
  */
 class Manager extends XFCP_Manager
 {

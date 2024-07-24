@@ -5,7 +5,7 @@ namespace SV\SlowQueryLogger\XFRM\Service\ResourceUpdate;
 use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
 
 /**
- * Extends \XFRM\Service\ResourceUpdate\Notify
+ * @Extends \XFRM\Service\ResourceUpdate\Notify
  */
 class Notify extends XFCP_Notify
 {

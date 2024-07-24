@@ -3,7 +3,7 @@
     "title": "Slow Query Logger",
     "description": "Logs slow queries to the server error log.",
     "version_id": 1682699682,
-    "version_string": "2.3.0",
+    "version_string": "2.2.2",
     "dev": "Xon",
     "dev_url": "https://atelieraphelion.com/",
     "faq_url": "",

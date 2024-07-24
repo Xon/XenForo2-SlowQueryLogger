@@ -5,7 +5,7 @@ namespace SV\SlowQueryLogger\XF\Entity;
 use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
 
 /**
- * Extends \XF\Entity\UserAlert
+ * @Extends \XF\Entity\UserAlert
  */
 class UserAlert extends XFCP_UserAlert
 {

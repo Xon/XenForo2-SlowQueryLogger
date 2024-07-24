@@ -7,11 +7,6 @@ use XF\App;
 use function class_alias;
 use function class_exists;
 
-/**
- * Class Listener
- *
- * @package SV\SlowQueryLogger
- */
 abstract class Listener
 {
     private function __construct() {}

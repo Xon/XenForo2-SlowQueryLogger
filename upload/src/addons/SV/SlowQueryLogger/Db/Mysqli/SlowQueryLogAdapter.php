@@ -12,9 +12,7 @@ use function microtime;
 use function round;
 
 /**
- * Class SlowQueryLogAdapter
- *
- * @package SV\SlowQueryLogger\Db\Mysqli
+ * @extends MySqlAdapter
  */
 class SlowQueryLogAdapter extends FakeParent
 {
