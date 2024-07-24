@@ -3,6 +3,7 @@
 namespace SV\SlowQueryLogger;
 
 use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter;
+use SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent;
 use XF\App;
 use function class_alias;
 use function class_exists;
@@ -14,7 +15,7 @@ abstract class Listener
     public static function appSetup(App $app): void
     {
         $result = true;
-        $fakeParent = 'SV\SlowQueryLogger\Db\Mysqli\SlowQueryLogAdapter\FakeParent';
+        $fakeParent = FakeParent::class;
         if (!class_exists($fakeParent, false))
         {
             $config = $app->config('db');
