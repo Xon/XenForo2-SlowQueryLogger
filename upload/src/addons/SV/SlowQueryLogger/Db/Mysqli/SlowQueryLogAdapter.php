@@ -9,6 +9,7 @@ use XF\Db\Exception;
 use XF\Db\Mysqli\Adapter as MySqlAdapter;
 use XF\Pub\App;
 use function microtime;
+use function register_shutdown_function;
 use function round;
 
 /**
