@@ -28,18 +28,35 @@ abstract class Listener
         if ($result)
         {
             $c = $app->container();
-            $c->set('db', function ($c) use ($app) {
+            $queryLog = $queryCount = null;
+            if ($c->isCached('db'))
+            {
+                $oldDb = \XF::db();
+                // Patching known possible uses happens after shimming the cache, so cleanup the existing database connection
+                @$oldDb->rollbackAll();
+                $oldDb->closeConnection();
+                // extract stats and push to the replacing instance
+                $queryLog = $oldDb->getQueryLog();
+                $queryCount = $oldDb->getQueryCount();
+            }
+
+            $c->set('db', function ($c) use ($app, &$queryLog, $queryCount) {
                 $config = $c['config'];
 
                 $dbConfig = $config['db'];
-                $adapterClass = SlowQueryLogAdapter::class;
                 unset($dbConfig['adapterClass']);
 
-                $db = new $adapterClass($dbConfig, $config['fullUnicode']);
+                $db = new SlowQueryLogAdapter($dbConfig, $config['fullUnicode']);
                 if (\XF::$debugMode)
                 {
                     $debugFlag = (bool)$app->request()->get('_debug');
                     $db->logQueries(true, !$debugFlag);
+                }
+                if ($queryLog !== null)
+                {
+                    $db->svSetQueryLog($queryLog, $queryCount);
+                    // release memory
+                    $queryLog = null;
                 }
 
                 return $db;

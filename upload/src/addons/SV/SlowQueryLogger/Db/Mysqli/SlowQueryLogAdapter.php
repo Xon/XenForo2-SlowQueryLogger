@@ -153,7 +153,6 @@ class SlowQueryLogAdapter extends FakeParent
             {
                 $adapterClass = MySqlAdapter::class;
             }
-            /** @var AbstractAdapter $db */
             self::$slowQueryDb = new $adapterClass($dbConfig, $config['fullUnicode']);
             // prevent recursive profiling
             self::$slowQueryDb->logQueries(false, false);
@@ -399,5 +398,11 @@ class SlowQueryLogAdapter extends FakeParent
                 \XF::logException(new Exception('Slow transaction detected: ' . round($queryEndTime, 4) . ' seconds' . (empty($requestData['url']) ? '' : ', ' . $requestData['url'])), false, '', true);
             });
         }
+    }
+
+    public function svSetQueryLog(array $queryLog, int $queryCount): void
+    {
+        $this->queryLog = $queryLog;
+        $this->queryCount = $queryCount;
     }
 }
