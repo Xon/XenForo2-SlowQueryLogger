@@ -47,7 +47,7 @@ abstract class Listener
 
             $keys = [
                 'permission.cache',
-                // need to patch the \XF\Mvc\Entity\Manager::$db is something has touched \XF::em() before this code runs
+                // need to patch the \XF\Mvc\Entity\Manager::$db is something has touched \XF::em() or \XF::repository() before this code runs
                 // otherwise the transaction state can get out of sync and then causes really *weird* bugs
                 'em',
                 // todo; check other built-ins that may require patching
