@@ -56,6 +56,15 @@ class SlowQueryLogAdapter extends FakeParent
         });
     }
 
+    public function closeConnection()
+    {
+        parent::closeConnection();
+        if (self::$slowQueryDb !== null)
+        {
+            self::$slowQueryDb->closeConnection();
+        }
+    }
+
     /**
      * Runs in the context of the original database adapter
      * This ensures database queries do not cause a loop
