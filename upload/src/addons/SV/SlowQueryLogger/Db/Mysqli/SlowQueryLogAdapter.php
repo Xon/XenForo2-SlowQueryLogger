@@ -146,10 +146,10 @@ class SlowQueryLogAdapter extends FakeParent
         {
             $config = $app->config();
             $dbConfig = $config['db'];
-            $adapterClass = $dbConfig['adapterClass'];
+            $adapterClass = $dbConfig['adapterClass'] ?? '';
             unset($dbConfig['adapterClass']);
 
-            if ($adapterClass === self::class)
+            if ($adapterClass === '' || $adapterClass === self::class)
             {
                 $adapterClass = MySqlAdapter::class;
             }
