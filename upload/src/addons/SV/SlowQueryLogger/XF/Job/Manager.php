@@ -20,7 +20,7 @@ class Manager extends XFCP_Manager
     protected function runJobInternal(array $job, $maxRunTime)
     {
         // skip jobs that are run via front-end bits as it causes too much chatter
-        if (\XF::options()->tooManyQueryPublicOnly ?? false)
+        if (\XF::options()->sv_toomany_queries_public_only ?? false)
         {
             $db = \XF::db();
             if ($db instanceof SlowQueryLogAdapter)
